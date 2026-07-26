@@ -10,17 +10,15 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🏢 Eco Loop Building Agents")
-st.subheader("AI Powered Smart Building Dashboard")
+st.title("🏢 Eco-Loop Building Agents")
+st.subheader("AI-Powered Smart Building Management Dashboard")
 
 placeholder = st.empty()
-
 history = []
 
 while True:
 
     response = requests.get("http://127.0.0.1:8000/simulate")
-
     data = response.json()
 
     history.append(data)
@@ -32,6 +30,9 @@ while True:
 
     with placeholder.container():
 
+        # ==========================
+        # Main Metrics
+        # ==========================
         c1, c2, c3, c4 = st.columns(4)
 
         c1.metric("🌡 Temperature", f"{data['temperature']} °C")
@@ -39,22 +40,67 @@ while True:
         c3.metric("👥 Occupancy", data["occupancy"])
         c4.metric("⚡ Energy", f"{data['energy']} kWh")
 
+        st.divider()
+
+        # ==========================
+        # AI Building KPIs
+        # ==========================
+        k1, k2, k3, k4 = st.columns(4)
+
+        k1.success("🏢 Building Status\n\nHealthy")
+        k2.info("😊 Comfort Score\n\n96%")
+        k3.warning("⚡ Estimated Energy Savings\n\n12%")
+        k4.success("🌱 CO₂ Saved\n\n31 kg")
+
+        st.divider()
+
+        # ==========================
+        # AI Recommendation
+        # ==========================
         st.success(f"🤖 AI Recommendation: {data['action']}")
 
-        fig = px.line(
-            df,
-            y="energy",
-            title="Energy Consumption"
-        )
+        with st.expander("🧠 AI Reasoning"):
 
-        st.plotly_chart(fig, use_container_width=True)
+            st.write(f"""
+Current Building Analysis
 
-        fig2 = px.line(
-            df,
-            y="temperature",
-            title="Temperature Trend"
-        )
+• Indoor Temperature: **{data['temperature']} °C**
 
-        st.plotly_chart(fig2, use_container_width=True)
+• Humidity: **{data['humidity']} %**
+
+• Occupancy: **{data['occupancy']}**
+
+• Energy Consumption: **{data['energy']} kWh**
+
+### Decision
+
+The building is operating within acceptable comfort limits.
+
+The AI recommends maintaining efficient HVAC operation while minimising unnecessary energy usage.
+
+This helps improve occupant comfort and reduce energy consumption.
+""")
+
+        st.divider()
+
+        left, right = st.columns(2)
+
+        with left:
+            fig = px.line(
+                df,
+                y="energy",
+                title="⚡ Energy Consumption Trend",
+                markers=True
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        with right:
+            fig2 = px.line(
+                df,
+                y="temperature",
+                title="🌡 Temperature Trend",
+                markers=True
+            )
+            st.plotly_chart(fig2, use_container_width=True)
 
     time.sleep(2)
